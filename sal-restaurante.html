@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAL — Cocina de mercado</title>
+<style>
+
+/* ============================================================
+   BLOQUE DE CONFIGURACIÓN — EDITA AQUÍ EL CONTENIDO DEL NEGOCIO
+   (los textos de la web se generan a partir de la sección
+   <script id="config"> que está al final del <body>)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --stone:      #EAE6DC;
+  --stone-dark: #DCD6C8;
+  --ink:        #17241C;
+  --ink-soft:   #2C362D;
+  --brass:      #B4863B;
+  --brass-soft: #D9BD86;
+  --sage:       #6E7D63;
+  --paper:      #F6F4EE;
+  --line:       rgba(23,36,28,0.16);
+
+  --display: 'Space Grotesk', sans-serif;
+  --body: 'Inter', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+
+  --maxw: 1180px;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+body{
+  background:var(--stone);
+  color:var(--ink);
+  font-family:var(--body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+}
+a{ color:inherit; text-decoration:none; }
+img{ max-width:100%; display:block; }
+button{ font-family:inherit; cursor:pointer; }
+:focus-visible{ outline:2px solid var(--brass); outline-offset:3px; }
+
+.wrap{ max-width:var(--maxw); margin:0 auto; padding:0 32px; }
+@media (max-width:640px){ .wrap{ padding:0 20px; } }
+
+.eyebrow{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--sage);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.eyebrow::before{
+  content:'';
+  width:18px; height:1px;
+  background:var(--brass);
+  display:inline-block;
+}
+
+/* ---------- NAV ---------- */
+header.nav{
+  position:sticky; top:0; z-index:50;
+  background:rgba(234,230,220,0.88);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 32px;
+  max-width:var(--maxw); margin:0 auto;
+}
+.brand{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:22px;
+  letter-spacing:0.02em;
+}
+.brand span{ color:var(--brass); }
+nav.links{ display:flex; gap:32px; font-size:14px; }
+nav.links a{
+  position:relative; padding-bottom:3px;
+}
+nav.links a::after{
+  content:''; position:absolute; left:0; bottom:0; width:0; height:1px;
+  background:var(--ink); transition:width .25s ease;
+}
+nav.links a:hover::after{ width:100%; }
+.nav-cta{
+  font-family:var(--mono); font-size:13px;
+  border:1px solid var(--ink); padding:9px 18px; border-radius:2px;
+  transition:background .2s ease, color .2s ease;
+}
+.nav-cta:hover{ background:var(--ink); color:var(--paper); }
+.burger{ display:none; }
+@media (max-width:780px){
+  nav.links{ display:none; }
+  .burger{ display:block; font-family:var(--mono); font-size:13px; border:1px solid var(--ink); padding:8px 14px; }
+}
+
+/* ---------- HERO ---------- */
+.hero{
+  position:relative;
+  padding:120px 0 90px;
+  overflow:hidden;
+  border-bottom:1px solid var(--line);
+}
+.hero .wrap{ position:relative; z-index:2; }
+.hero-eyebrow{ margin-bottom:28px; }
+.hero h1{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:clamp(56px, 11vw, 128px);
+  line-height:0.92;
+  letter-spacing:-0.01em;
+  max-width:14ch;
+}
+.hero h1 em{
+  font-style:normal;
+  color:transparent;
+  -webkit-text-stroke:1.5px var(--ink);
+}
+.hero-sub{
+  margin-top:28px;
+  max-width:460px;
+  font-size:18px;
+  color:var(--ink-soft);
+}
+.hero-actions{ margin-top:42px; display:flex; gap:16px; flex-wrap:wrap; }
+.btn{
+  font-family:var(--mono); font-size:13px; letter-spacing:.02em;
+  padding:14px 26px; border-radius:2px; display:inline-flex; align-items:center; gap:10px;
+  transition:transform .2s ease, background .2s ease, color .2s ease;
+}
+.btn-primary{ background:var(--ink); color:var(--paper); }
+.btn-primary:hover{ background:var(--brass); transform:translateY(-2px); }
+.btn-ghost{ border:1px solid var(--ink); }
+.btn-ghost:hover{ background:var(--ink); color:var(--paper); }
+
+/* marquee ticker of dishes — signature motion element */
+.ticker{
+  margin-top:80px;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  padding:16px 0;
+  overflow:hidden;
+  white-space:nowrap;
+}
+.ticker-track{
+  display:inline-flex;
+  gap:48px;
+  animation:scroll 32s linear infinite;
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--sage);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.ticker-track span::after{ content:'—'; margin-left:48px; color:var(--brass-soft); }
+@keyframes scroll{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
+
+/* ---------- SECTION HEADS ---------- */
+.section{ padding:110px 0; border-bottom:1px solid var(--line); }
+.section-head{
+  display:flex; justify-content:space-between; align-items:flex-end;
+  margin-bottom:64px; gap:24px; flex-wrap:wrap;
+}
+.section-head h2{
+  font-family:var(--display); font-weight:700;
+  font-size:clamp(34px, 5vw, 52px);
+  letter-spacing:-0.01em;
+}
+.section-head p{ max-width:340px; color:var(--ink-soft); font-size:15px; }
+
+/* ---------- MENU (styled as a printed docket) ---------- */
+.menu-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 80px; }
+@media (max-width:780px){ .menu-grid{ grid-template-columns:1fr; } }
+.menu-cat{ margin-bottom:56px; }
+.menu-cat h3{
+  font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:.1em;
+  color:var(--brass); margin-bottom:22px; padding-bottom:10px; border-bottom:1px solid var(--line);
+}
+.menu-item{
+  display:flex; justify-content:space-between; gap:16px;
+  padding:14px 0; border-bottom:1px dashed var(--line);
+}
+.menu-item:last-child{ border-bottom:none; }
+.menu-item-name{ font-family:var(--display); font-weight:500; font-size:17px; }
+.menu-item-desc{ font-size:13.5px; color:var(--ink-soft); margin-top:4px; max-width:34ch; }
+.menu-item-price{ font-family:var(--mono); font-size:15px; white-space:nowrap; padding-top:2px; }
+
+/* ---------- ABOUT ---------- */
+.about{ display:grid; grid-template-columns:0.9fr 1.1fr; gap:72px; align-items:start; }
+@media (max-width:860px){ .about{ grid-template-columns:1fr; gap:48px; } }
+.about-quote{
+  font-family:var(--display); font-weight:500;
+  font-size:clamp(24px,3vw,32px); line-height:1.3;
+  color:var(--ink);
+  border-left:2px solid var(--brass);
+  padding-left:28px;
+}
+.about-body p{ margin-bottom:20px; color:var(--ink-soft); font-size:15.5px; }
+.about-stats{ display:flex; gap:44px; margin-top:36px; }
+.about-stats div strong{ display:block; font-family:var(--display); font-size:30px; }
+.about-stats div span{ font-family:var(--mono); font-size:12px; color:var(--sage); text-transform:uppercase; }
+
+/* ---------- CONTACT / LOCATION ---------- */
+.contact-grid{ display:grid; grid-template-columns:1fr 1fr; gap:64px; }
+@media (max-width:860px){ .contact-grid{ grid-template-columns:1fr; } }
+.info-ticket{
+  font-family:var(--mono); font-size:13.5px;
+  background:var(--paper); border:1px solid var(--line); border-radius:2px;
+  padding:28px;
+}
+.info-ticket .row{
+  display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px dashed var(--line);
+  gap:16px;
+}
+.info-ticket .row:last-child{ border-bottom:none; }
+.info-ticket .row span:first-child{ color:var(--sage); }
+.map-frame{ border:1px solid var(--line); border-radius:2px; overflow:hidden; min-height:280px; }
+.map-frame iframe{ width:100%; height:100%; min-height:280px; border:0; filter:grayscale(0.3) contrast(1.05); }
+
+/* ---------- RESERVATION SYSTEM ---------- */
+.reserve{ background:var(--ink); color:var(--paper); }
+.reserve .eyebrow{ color:var(--brass-soft); }
+.reserve .eyebrow::before{ background:var(--brass-soft); }
+.reserve .section-head h2{ color:var(--paper); }
+.reserve .section-head p{ color:rgba(246,244,238,0.65); }
+
+.res-grid{ display:grid; grid-template-columns:1.1fr 0.9fr; gap:56px; align-items:start; }
+@media (max-width:900px){ .res-grid{ grid-template-columns:1fr; } }
+
+.res-form{ display:flex; flex-direction:column; gap:18px; }
+.field-row{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+@media (max-width:520px){ .field-row{ grid-template-columns:1fr; } }
+.field label{
+  display:block; font-family:var(--mono); font-size:11.5px; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--brass-soft); margin-bottom:8px;
+}
+.field input, .field select, .field textarea{
+  width:100%; background:transparent; border:1px solid rgba(246,244,238,0.28);
+  border-radius:2px; padding:12px 14px; color:var(--paper); font-family:var(--body); font-size:14.5px;
+}
+.field input::placeholder, .field textarea::placeholder{ color:rgba(246,244,238,0.35); }
+.field select option{ color:var(--ink); }
+.field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--brass-soft); }
+.party-stepper{ display:flex; align-items:center; gap:14px; border:1px solid rgba(246,244,238,0.28); border-radius:2px; padding:8px 14px; width:fit-content; }
+.party-stepper button{ background:none; border:none; color:var(--paper); font-family:var(--mono); font-size:16px; width:22px; }
+.party-stepper span{ font-family:var(--mono); min-width:26px; text-align:center; }
+
+.res-submit{
+  margin-top:8px; align-self:flex-start;
+  font-family:var(--mono); font-size:13px; letter-spacing:.02em;
+  padding:15px 30px; border-radius:2px; background:var(--brass); color:var(--ink); border:none;
+  transition:background .2s ease, transform .2s ease;
+}
+.res-submit:hover{ background:var(--brass-soft); transform:translateY(-2px); }
+.res-error{ font-family:var(--mono); font-size:12.5px; color:#E39A8B; min-height:16px; }
+
+/* ticket preview / confirmation */
+.ticket{
+  background:var(--paper); color:var(--ink);
+  border-radius:2px; padding:32px;
+  font-family:var(--mono); font-size:13px;
+  position:relative;
+}
+.ticket::before, .ticket::after{
+  content:''; position:absolute; left:0; right:0; height:10px;
+  background:
+   radial-gradient(circle at 8px 5px, var(--ink) 5px, transparent 5.5px) repeat-x;
+  background-size:20px 10px;
+}
+.ticket::before{ top:-5px; }
+.ticket::after{ bottom:-5px; transform:rotate(180deg); }
+.ticket h4{
+  font-family:var(--display); font-size:19px; text-align:center; margin-bottom:6px; letter-spacing:.02em;
+}
+.ticket .sub{ text-align:center; color:var(--sage); font-size:11px; text-transform:uppercase; letter-spacing:.1em; margin-bottom:20px; }
+.ticket hr{ border:none; border-top:1px dashed var(--line); margin:16px 0; }
+.ticket .trow{ display:flex; justify-content:space-between; padding:6px 0; }
+.ticket .trow span:first-child{ color:var(--sage); }
+.ticket .status{
+  margin-top:18px; text-align:center; padding:10px; border:1px dashed var(--line);
+  text-transform:uppercase; letter-spacing:.08em; font-size:11.5px;
+}
+.status.pending{ color:var(--brass); }
+.status.confirmed{ color:var(--sage); }
+.ticket .placeholder{ text-align:center; color:var(--line); padding:40px 0; font-size:12px; }
+
+/* ---------- FOOTER ---------- */
+footer{ padding:48px 0; }
+.footer-inner{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+.footer-brand{ font-family:var(--display); font-weight:700; font-size:16px; }
+.footer-meta{ font-family:var(--mono); font-size:12px; color:var(--sage); }
+
+/* toast */
+#toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120%);
+  background:var(--ink); color:var(--paper); font-family:var(--mono); font-size:13px;
+  padding:14px 22px; border-radius:2px; z-index:100; transition:transform .35s ease;
+  border:1px solid var(--brass-soft);
+}
+#toast.show{ transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand" id="nav-brand"></div>
+    <nav class="links">
+      <a href="#menu">Menú</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <a href="#reservas" class="nav-cta">Reservar mesa</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow" id="hero-eyebrow"></p>
+    <h1 id="hero-title"></h1>
+    <p class="hero-sub" id="hero-sub"></p>
+    <div class="hero-actions">
+      <a href="#reservas" class="btn btn-primary">Reservar mesa</a>
+      <a href="#menu" class="btn btn-ghost">Ver el menú</a>
+    </div>
+  </div>
+  <div class="ticker">
+    <div class="ticker-track" id="ticker-track"></div>
+  </div>
+</section>
+
+<section class="section" id="menu">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>El menú</h2>
+      <p id="menu-note"></p>
+    </div>
+    <div class="menu-grid" id="menu-grid"></div>
+  </div>
+</section>
+
+<section class="section" id="nosotros">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Sobre nosotros</h2>
+    </div>
+    <div class="about">
+      <p class="about-quote" id="about-quote"></p>
+      <div class="about-body">
+        <div id="about-paragraphs"></div>
+        <div class="about-stats" id="about-stats"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contacto">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Encuéntranos</h2>
+    </div>
+    <div class="contact-grid">
+      <div class="info-ticket" id="info-ticket"></div>
+      <div class="map-frame" id="map-frame"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section reserve" id="reservas" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Sistema de reservas</p>
+    </div>
+    <div class="section-head" style="margin-top:-40px;">
+      <h2>Reserva tu mesa</h2>
+      <p>Confirmamos por teléfono o email en menos de 24h. Sin registro, sin complicaciones.</p>
+    </div>
+
+    <div class="res-grid">
+      <form class="res-form" id="res-form">
+        <div class="field-row">
+          <div class="field">
+            <label for="r-name">Nombre</label>
+            <input id="r-name" type="text" placeholder="Nombre y apellidos" required>
+          </div>
+          <div class="field">
+            <label for="r-phone">Teléfono</label>
+            <input id="r-phone" type="tel" placeholder="600 000 000" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="r-date">Fecha</label>
+            <input id="r-date" type="date" required>
+          </div>
+          <div class="field">
+            <label for="r-time">Hora</label>
+            <select id="r-time" required></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Comensales</label>
+            <div class="party-stepper">
+              <button type="button" id="party-minus" aria-label="Menos comensales">−</button>
+              <span id="party-count">2</span>
+              <button type="button" id="party-plus" aria-label="Más comensales">+</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="r-email">Email (opcional)</label>
+            <input id="r-email" type="email" placeholder="tucorreo@ejemplo.com">
+          </div>
+        </div>
+        <div class="field">
+          <label for="r-notes">Notas (alergias, celebraciones...)</label>
+          <textarea id="r-notes" rows="2" placeholder="Ej: alergia a frutos secos, cumpleaños..."></textarea>
+        </div>
+        <p class="res-error" id="res-error"></p>
+        <button type="submit" class="res-submit" id="res-submit">Confirmar reserva</button>
+      </form>
+
+      <div class="ticket" id="ticket">
+        <div class="placeholder">Tu resguardo de reserva aparecerá aquí</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-brand" id="footer-brand"></div>
+    <div class="footer-meta" id="footer-meta"></div>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   CONFIG — TODO EL CONTENIDO DEL NEGOCIO SE EDITA AQUÍ.
+   No hace falta tocar el CSS ni el HTML de arriba para
+   cambiar textos, precios, horarios o el menú.
+   ============================================================ */
+const CONFIG = {
+  brand: "SAL",
+  tagline: "Cocina de mercado, sin ruido.",
+  heroEyebrow: "Restaurante · Granada",
+  heroTitle: "Comida honesta,\nservida con <em>calma</em>.",
+  heroSub: "Producto de temporada, técnica sencilla y una sala pensada para quedarse un rato más. Abrimos de martes a domingo.",
+
+  tickerDishes: [
+    "Boquerones en vinagre", "Tosta de tomate y ajo negro", "Arroz de temporada",
+    "Croquetas de jamón ibérico", "Pescado del día a la brasa", "Tarta de queso al horno"
+  ],
+
+  menuNote: "Carta corta, cambia cada 3–4 semanas según mercado.",
+  menu: [
+    {
+      category: "Para empezar",
+      items: [
+        { name: "Boquerones en vinagre", desc: "Ajo, perejil y aceite de Sierra Mágina", price: "8€" },
+        { name: "Tosta de tomate y ajo negro", desc: "Pan de masa madre, aceite de oliva virgen", price: "6€" },
+        { name: "Croquetas de jamón ibérico", desc: "Cinco unidades, bechamel de 24h", price: "9€" }
+      ]
+    },
+    {
+      category: "Principales",
+      items: [
+        { name: "Arroz de temporada", desc: "Verdura de mercado, caldo de hueso", price: "16€" },
+        { name: "Pescado del día a la brasa", desc: "Según lonja, con salsa verde", price: "19€" },
+        { name: "Carrillada al vino tinto", desc: "Puré de patata trufado", price: "17€" }
+      ]
+    },
+    {
+      category: "Para compartir",
+      items: [
+        { name: "Tabla de quesos de la sierra", desc: "Tres quesos, membrillo, nueces", price: "14€" },
+        { name: "Jamón ibérico de bellota", desc: "Cortado a cuchillo, 100g", price: "18€" }
+      ]
+    },
+    {
+      category: "Dulce",
+      items: [
+        { name: "Tarta de queso al horno", desc: "Receta de la abuela, sin más", price: "6€" },
+        { name: "Torrija caramelizada", desc: "Helado de vainilla artesano", price: "6€" }
+      ]
+    }
+  ],
+
+  aboutQuote: "No cocinamos para impresionar. Cocinamos para que vuelvas.",
+  aboutParagraphs: [
+    "SAL nació en 2019 como un local pequeño con una idea clara: comprar bien, tocar poco y servir rápido. Trabajamos con productores de la provincia y cambiamos la carta según lo que trae el mercado, no según lo que esté de moda.",
+    "La sala tiene 28 mesas, cocina abierta y un ritmo tranquilo. No hacemos menú del día ni buffet: cada plato se hace a la orden, con calma."
+  ],
+  aboutStats: [
+    { value: "2019", label: "Desde" },
+    { value: "28", label: "Mesas" },
+    { value: "100%", label: "Producto local" }
+  ],
+
+  contact: {
+    address: "Calle Recogidas 14, 18002 Granada",
+    phone: "+34 958 000 000",
+    email: "reservas@sal-restaurante.es",
+    hours: [
+      { day: "Martes – Jueves", time: "13:30–16:00 / 20:30–23:00" },
+      { day: "Viernes – Sábado", time: "13:30–16:30 / 20:30–23:30" },
+      { day: "Domingo", time: "13:30–16:30" },
+      { day: "Lunes", time: "Cerrado" }
+    ],
+    mapQuery: "Calle Recogidas 14, Granada, España"
+  },
+
+  reservation: {
+    timeSlots: ["13:30","14:00","14:30","15:00","20:30","21:00","21:30","22:00"],
+    maxParty: 10,
+    minParty: 1
+  },
+
+  footerNote: "Página creada para SAL · edítala libremente"
+};
+/* ============ FIN DEL BLOQUE DE CONFIGURACIÓN ============ */
+
+
+/* ---------------- RENDER: contenido a partir de CONFIG ---------------- */
+document.getElementById('nav-brand').textContent = CONFIG.brand;
+document.getElementById('footer-brand').textContent = CONFIG.brand + " — " + CONFIG.tagline;
+document.getElementById('footer-meta').textContent = CONFIG.footerNote;
+
+document.getElementById('hero-eyebrow').textContent = CONFIG.heroEyebrow;
+document.getElementById('hero-title').innerHTML = CONFIG.heroTitle.replace(/\n/g,'<br>');
+document.getElementById('hero-sub').textContent = CONFIG.heroSub;
+
+const tickerTrack = document.getElementById('ticker-track');
+const tickerItems = [...CONFIG.tickerDishes, ...CONFIG.tickerDishes]; // duplicado para loop continuo
+tickerTrack.innerHTML = tickerItems.map(d => `<span>${d}</span>`).join('');
+
+document.getElementById('menu-note').textContent = CONFIG.menuNote;
+document.getElementById('menu-grid').innerHTML = CONFIG.menu.map(cat => `
+  <div class="menu-cat">
+    <h3>${cat.category}</h3>
+    ${cat.items.map(it => `
+      <div class="menu-item">
+        <div>
+          <div class="menu-item-name">${it.name}</div>
+          <div class="menu-item-desc">${it.desc}</div>
+        </div>
+        <div class="menu-item-price">${it.price}</div>
+      </div>
+    `).join('')}
+  </div>
+`).join('');
+
+document.getElementById('about-quote').textContent = CONFIG.aboutQuote;
+document.getElementById('about-paragraphs').innerHTML = CONFIG.aboutParagraphs.map(p => `<p>${p}</p>`).join('');
+document.getElementById('about-stats').innerHTML = CONFIG.aboutStats.map(s => `
+  <div><strong>${s.value}</strong><span>${s.label}</span></div>
+`).join('');
+
+document.getElementById('info-ticket').innerHTML = `
+  <div class="row"><span>Dirección</span><span>${CONFIG.contact.address}</span></div>
+  <div class="row"><span>Teléfono</span><span>${CONFIG.contact.phone}</span></div>
+  <div class="row"><span>Email</span><span>${CONFIG.contact.email}</span></div>
+  ${CONFIG.contact.hours.map(h => `<div class="row"><span>${h.day}</span><span>${h.time}</span></div>`).join('')}
+`;
+
+document.getElementById('map-frame').innerHTML = `
+  <iframe
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade"
+    src="https://www.google.com/maps?q=${encodeURIComponent(CONFIG.contact.mapQuery)}&output=embed">
+  </iframe>
+`;
+
+const timeSelect = document.getElementById('r-time');
+timeSelect.innerHTML = '<option value="" disabled selected>Elige una hora</option>' +
+  CONFIG.reservation.timeSlots.map(t => `<option value="${t}">${t}</option>`).join('');
+
+const dateInput = document.getElementById('r-date');
+dateInput.min = new Date().toISOString().split('T')[0];
+
+/* ---------------- LÓGICA: contador de comensales ---------------- */
+let partyCount = 2;
+const partyCountEl = document.getElementById('party-count');
+document.getElementById('party-minus').addEventListener('click', () => {
+  if (partyCount > CONFIG.reservation.minParty) { partyCount--; partyCountEl.textContent = partyCount; }
+});
+document.getElementById('party-plus').addEventListener('click', () => {
+  if (partyCount < CONFIG.reservation.maxParty) { partyCount++; partyCountEl.textContent = partyCount; }
+});
+
+/* ---------------- LÓGICA: sistema de reservas ---------------- */
+// Las reservas se guardan en memoria durante la sesión. Para producción,
+// conecta este formulario a tu backend / email / Google Sheets en la
+// función submitReservation() más abajo.
+const reservations = [];
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 3200);
+}
+
+function renderTicket(res, status){
+  const ticket = document.getElementById('ticket');
+  const dateObj = new Date(res.date + 'T00:00:00');
+  const dateStr = dateObj.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
+  ticket.innerHTML = `
+    <h4>${CONFIG.brand}</h4>
+    <div class="sub">Resguardo de reserva</div>
+    <hr>
+    <div class="trow"><span>Nombre</span><span>${res.name}</span></div>
+    <div class="trow"><span>Fecha</span><span>${dateStr}</span></div>
+    <div class="trow"><span>Hora</span><span>${res.time}</span></div>
+    <div class="trow"><span>Comensales</span><span>${res.party}</span></div>
+    <div class="trow"><span>Teléfono</span><span>${res.phone}</span></div>
+    ${res.notes ? `<div class="trow"><span>Notas</span><span>${res.notes}</span></div>` : ''}
+    <hr>
+    <div class="trow"><span>Localizador</span><span>#${res.id}</span></div>
+    <div class="status ${status}">${status === 'confirmed' ? 'Reserva confirmada' : 'Pendiente de confirmar'}</div>
+  `;
+}
+
+function submitReservation(res){
+  // AQUÍ se conectaría con el backend real (API propia, Formspree,
+  // Google Sheets, WhatsApp Business, etc). Por ahora se simula
+  // la confirmación en el propio navegador.
+  reservations.push(res);
+  return true;
+}
+
+document.getElementById('res-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const errorEl = document.getElementById('res-error');
+  errorEl.textContent = '';
+
+  const name = document.getElementById('r-name').value.trim();
+  const phone = document.getElementById('r-phone').value.trim();
+  const date = document.getElementById('r-date').value;
+  const time = document.getElementById('r-time').value;
+  const email = document.getElementById('r-email').value.trim();
+  const notes = document.getElementById('r-notes').value.trim();
+
+  if(!name || !phone || !date || !time){
+    errorEl.textContent = 'Por favor, completa nombre, teléfono, fecha y hora.';
+    return;
+  }
+
+  const res = {
+    id: Math.random().toString(36).slice(2,8).toUpperCase(),
+    name, phone, email, date, time, notes,
+    party: partyCount
+  };
+
+  renderTicket(res, 'pending');
+  const submitBtn = document.getElementById('res-submit');
+  submitBtn.textContent = 'Confirmando...';
+  submitBtn.disabled = true;
+
+  setTimeout(() => {
+    submitReservation(res);
+    renderTicket(res, 'confirmed');
+    submitBtn.textContent = 'Confirmar reserva';
+    submitBtn.disabled = false;
+    showToast(`Reserva confirmada · #${res.id}`);
+    this.reset();
+    partyCount = 2;
+    partyCountEl.textContent = 2;
+  }, 700);
+});
+</script>
+
+</body>
+</html>
